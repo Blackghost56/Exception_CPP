@@ -115,6 +115,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Dictionary_my.cpp" />
+    <ClCompile Include="Interface.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="NotFoundException_my.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Dictionary_my.h" />
+    <ClInclude Include="Interface.h" />
+    <ClInclude Include="NotFoundException_my.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
