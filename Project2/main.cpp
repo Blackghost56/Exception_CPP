@@ -2,6 +2,12 @@
 #include <iostream>
 #include <string>
 
+#define TYPE_KEY_0		int
+#define TYPE_VALUE_0	int
+#define TYPE_KEY_1		std::string
+#define TYPE_VALUE_1	std::string
+
+
 template<class TKey, class TValue>
 void search(const Dictionary_my<TKey, TValue> &dict, const TKey& key) {
 	TValue value;
@@ -29,21 +35,49 @@ void isSet(const Dictionary_my<TKey, TValue> &dict, const TKey& key) {
 
 int main(int argc, char** argv)
 {
-	Dictionary_my<std::string, std::string> dict;
+	Dictionary_my<TYPE_KEY_0, TYPE_VALUE_0> dict_0;
+	// Test. Old value replacement
+	dict_0.Set(1, 2);
+	search<TYPE_KEY_0, TYPE_VALUE_0>(dict_0, 1);
+	dict_0.Set(1, 3);
+	search<TYPE_KEY_0, TYPE_VALUE_0>(dict_0, 1);
 
+	Dictionary_my<TYPE_KEY_1, TYPE_VALUE_1> dict_1;
 	// Dictionary_my<TKey, TValue>::Set test
-	dict.Set("Tsvetkov", "+79811213016");
+	dict_1.Set("Tsvetkov", "+79811213016");
 
 	// Dictionary_my<TKey, TValue>::isSet Test
-	std::string name = "Zenkin";
-	isSet<std::string, std::string>(dict, name);	// is not set
-	dict.Set(name, "+79811213032");
-	isSet<std::string, std::string>(dict, name);	// is set
+	TYPE_KEY_1 name = "Zenkin";
+	isSet<TYPE_KEY_1, TYPE_VALUE_1>(dict_1, name);	// is not set
+	dict_1.Set(name, "+79811213032");
+	isSet<TYPE_KEY_1, TYPE_VALUE_1>(dict_1, name);	// is set
 	
 	// Dictionary_my<TKey, TValue>::Get Test
-	search<std::string, std::string>(dict, "Tsvetkov");  
-	search<std::string, std::string>(dict, "Ptushkin");  // Not found exception
-	search<std::string, std::string>(dict, "Zenkin");
+	search<TYPE_KEY_1, TYPE_VALUE_1>(dict_1, "Tsvetkov");
+	search<TYPE_KEY_1, TYPE_VALUE_1>(dict_1, "Ptushkin");  // Not found exception
+	search<TYPE_KEY_1, TYPE_VALUE_1>(dict_1, "Zenkin");
+
+	// Thread test
+	int size_1 = 100000;  // should be large enough for the second thread to start
+	int size_2 = 100;  
+	auto func_set = [](Dictionary_my<TYPE_KEY_0, TYPE_VALUE_0> &dict, const TYPE_KEY_0 key, const int size)
+    {
+		for (auto i = 0; i < size; i++)
+		{
+			dict.Set(key, i);
+		}
+    };
+	auto func_get = [](const Dictionary_my<TYPE_KEY_0, TYPE_VALUE_0> &dict, const TYPE_KEY_0 key, const int size)
+	{
+		for (auto i = 0; i < size; i++)
+		{
+			search<TYPE_KEY_0, TYPE_VALUE_0>(dict, key);
+		}
+	};
+	std::thread thread_set(func_set, std::ref(dict_0), 3, size_1);
+	std::thread thread_get(func_get, std::ref(dict_0), 3, size_2);
+	thread_set.join();
+	thread_get.join();
 
 	system("pause");
 	return 0;
